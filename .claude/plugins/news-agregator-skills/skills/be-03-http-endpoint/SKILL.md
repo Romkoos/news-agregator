@@ -68,8 +68,9 @@ export async function <routeName>Handler(
   request: FastifyRequest,
   reply: FastifyReply
 ): Promise<void> {
-  // TODO: instantiate use-case with dependencies
-  const useCase = new <UseCaseName>UseCase(/* inject repo */);
+  // TODO: resolve use-case from DI / composition root, not inline construction.
+  // Example: const useCase = request.server.container.resolve('<UseCaseName>UseCase');
+  const useCase = (request.server as any).<useCaseName>UseCase;
   const result = await useCase.execute(request.body);
   await reply.send(result);
 }

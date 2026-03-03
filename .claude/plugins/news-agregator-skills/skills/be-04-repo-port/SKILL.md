@@ -63,20 +63,28 @@ export function toDomain(record: <PrismaModelName>): <EntityName> {
     // TODO: map Prisma fields to domain fields
   };
 }
+
+export function toPrismaCreate(data: Create<EntityName>Data): Omit<<PrismaModelName>, 'id' | 'createdAt' | 'updatedAt'> {
+  return {
+    // TODO: map domain create data to Prisma input fields
+  } as any;
+}
 ```
+
+Note: `<PrismaModelName>` is typically the same as `entityName` in PascalCase — verify the exact name in `apps/backend/prisma/schema.prisma`.
 
 4. Create `adapters/persistence/prisma/<repo-name>.prisma.ts`:
 
 ```typescript
 import type { PrismaClient } from '@prisma/client';
 import type { <RepoName>, Create<EntityName>Data, <EntityName> } from '../../../ports/outbound/<repo-name>';
-import { toDomain } from './<entity-name>.mapper';
+import { toDomain, toPrismaCreate } from './<entity-name>.mapper';
 
 export class Prisma<RepoName> implements <RepoName> {
   constructor(private readonly prisma: PrismaClient) {}
 
   async create(data: Create<EntityName>Data): Promise<<EntityName>> {
-    const record = await this.prisma.<modelName>.create({ data });
+    const record = await this.prisma.<modelName>.create({ data: toPrismaCreate(data) });
     return toDomain(record);
   }
 

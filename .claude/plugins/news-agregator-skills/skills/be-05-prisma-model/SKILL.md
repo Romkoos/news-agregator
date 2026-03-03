@@ -44,15 +44,17 @@ model <ModelName> {
 
 ```bash
 # Creates migration file AND applies it to dev database
-pnpm -C apps/backend prisma migrate dev --name <snake_case_model_name>
+pnpm -C apps/backend prisma migrate dev --name add_<snake_case_model_name>
 ```
 
 3. Verify Prisma Client is regenerated: `pnpm -C apps/backend prisma generate`
 4. Confirm `apps/backend/package.json` `postinstall` includes `prisma generate`; if missing, add:
 
 ```json
-"postinstall": "prisma generate"
+"postinstall": "prisma generate --schema=./prisma/schema.prisma"
 ```
+
+This lives in `apps/backend/package.json` (not the workspace root). The `--schema` flag ensures the correct schema is found when run from the package directory.
 
 ## Commands reference
 

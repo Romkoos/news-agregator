@@ -38,6 +38,7 @@ Creates inside `apps/backend/src/modules/<moduleName>/`:
 ```typescript
 import { z } from 'zod';
 
+// The const and type intentionally share the same name — TypeScript value/type namespace merge.
 export const <UseCaseName>Input = z.object({
   // TODO: add fields matching commandShape
 });
@@ -58,9 +59,9 @@ import { <UseCaseName>Input, type <UseCaseName>Result } from '../dto/<use-case-n
 export class <UseCaseName>UseCase {
   constructor(private readonly repo: <RepositoryName>) {}
 
-  async execute(rawInput: unknown): Promise<<UseCaseName>Result> {
-    const input = <UseCaseName>Input.parse(rawInput);
-    // TODO: implement
+  async execute(input: <UseCaseName>Input): Promise<<UseCaseName>Result> {
+    const parsed = <UseCaseName>Input.parse(input);
+    // TODO: implement using `parsed`
     throw new Error('Not implemented');
   }
 }
