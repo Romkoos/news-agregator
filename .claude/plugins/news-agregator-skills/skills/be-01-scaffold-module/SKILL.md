@@ -50,7 +50,15 @@ Creates `apps/backend/src/modules/<moduleName>/` with:
 1. Verify `moduleName` is kebab-case and the directory does not already exist
 2. Create all directories per the tree above
 3. Create `adapters/http/router.ts` with a Fastify plugin stub that exports `async function register(app: FastifyInstance)`
-4. Create `index.ts` as the public API with placeholder re-export comments
+4. Create `index.ts` as the public API with this starter content:
+
+```typescript
+// Public API for <moduleName> module
+// Only export what consumers outside this module need.
+// Internal implementation details must NOT be exported here.
+export {};
+```
+
 5. Register the module router in `apps/backend/src/app/modules.ts`
 6. Run `pnpm -C apps/backend lint` — verify no boundary violations
 
@@ -58,6 +66,7 @@ Creates `apps/backend/src/modules/<moduleName>/` with:
 
 - `E_MODULE_EXISTS`: Directory already exists → report the path, ask user to confirm overwrite
 - `E_INVALID_NAME`: Name contains uppercase or spaces → suggest kebab-case correction
+- `E_LINT_UNAVAILABLE`: `lint` script missing from `apps/backend/package.json` → skip step 6, run `pnpm -C apps/backend tsc --noEmit` as a typecheck fallback instead
 
 ## Reference
 
