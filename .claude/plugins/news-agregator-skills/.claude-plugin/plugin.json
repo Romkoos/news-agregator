@@ -1,0 +1,5 @@
+{
+  "name": "news-agregator-skills",
+  "version": "0.1.0",
+  "description": "Project-specific dev skills for the news aggregator monorepo (FSD frontend + hexagonal backend)"
+}
