@@ -44,7 +44,7 @@ pnpm add -D turbo -w
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"]     // replace with outputsMap.build value
+      "outputs": ["dist/**"]
     },
     "lint": {
       "dependsOn": [],
@@ -56,13 +56,13 @@ pnpm add -D turbo -w
     },
     "test": {
       "dependsOn": [],
-      "outputs": ["coverage/**"] // replace with outputsMap.test value
+      "outputs": ["coverage/**"]
     }
   }
 }
 ```
 
-> Remove any task block not present in the `tasks` input. Replace each `outputs` value with the corresponding entry from `outputsMap` — for example, `outputsMap.build` → `["dist/**"]` and `outputsMap.test` → `["coverage/lcov.info"]`.
+> Remove any task block not present in the `tasks` input. Replace each `outputs` value with the corresponding entry from `outputsMap` — for example, `outputsMap.build` → `["dist/**"]` and `outputsMap.test` → `["coverage/lcov.info"]`. For `lint` and `typecheck`, the `outputs` array stays `[]` since they produce no cacheable artifacts (unless `outputsMap` provides values for them).
 
 4. Update root `package.json` scripts to delegate to Turborepo (add only the tasks from the `tasks` input):
 

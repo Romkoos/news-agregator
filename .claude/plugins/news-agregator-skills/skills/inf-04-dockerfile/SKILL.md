@@ -38,7 +38,7 @@ dist/
 *.local
 ```
 
-2. Create `apps/<target>/Dockerfile`. Substitute `<target>` with the `target` input value and `24` with `nodeVersion`:
+2. Create `apps/<target>/Dockerfile`. Substitute `<target>` with the `target` input value and `24` with `nodeVersion`. The stub below assumes `packageManager: 'pnpm'` (default):
 
 ```dockerfile
 # Build stage — compiles TypeScript for apps/<target>
@@ -61,6 +61,8 @@ COPY --from=build /app/apps/<target>/package.json ./package.json
 RUN corepack enable && pnpm install --prod --frozen-lockfile
 CMD ["node", "dist/main.js"]
 ```
+
+> **If `packageManager: 'npm'`**: remove both `RUN corepack enable` lines and both `COPY ... pnpm-lock.yaml` / `pnpm-workspace.yaml` lines; replace `pnpm install --frozen-lockfile` with `npm ci` and `pnpm install --prod --frozen-lockfile` with `npm ci --omit=dev`; replace `pnpm -C apps/<target> build` with `npm run build` (run from the app directory with a `WORKDIR` change).
 
 > For `target: 'frontend'`, the runtime CMD typically serves a static file server rather than `dist/main.js`.
 

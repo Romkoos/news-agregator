@@ -26,10 +26,17 @@ Creates/modifies:
 
 ## Workflow
 
-1. Install if not present:
+1. Install if not present. Scope the install command to match the `scope` input:
 
 ```bash
-pnpm add -D eslint typescript-eslint @eslint/js
+# scope: 'root'
+pnpm add -D -w eslint typescript-eslint @eslint/js
+
+# scope: 'backend'
+pnpm -C apps/backend add -D eslint typescript-eslint @eslint/js
+
+# scope: 'frontend'
+pnpm -C apps/frontend add -D eslint typescript-eslint @eslint/js
 ```
 
 2. Create `eslint.config.mjs` using flat config format.

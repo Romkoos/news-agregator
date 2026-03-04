@@ -28,7 +28,7 @@ Creates (optional — Railway also accepts manual UI config):
 
 ## Workflow
 
-1. Create a Railway project and add a new service connected to the GitHub repository
+1. Create a Railway project and add a new service named `<serviceName>` connected to the GitHub repository
 
 2. In service **Settings → Source**: set **Root Directory** to the `rootDir` input value (e.g., `apps/backend`). Railway will detect the `Dockerfile` in that directory automatically.
 
