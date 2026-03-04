@@ -57,7 +57,7 @@ export class ArticleNotFoundError extends DomainError {
 import type { FastifyError, FastifyReply, FastifyRequest } from 'fastify';
 import { DomainError } from '../../domain/errors';
 
-export function domainErrorHandler(
+export async function domainErrorHandler(
   error: FastifyError | DomainError,
   request: FastifyRequest,
   reply: FastifyReply

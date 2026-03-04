@@ -59,6 +59,7 @@ export { MovedClass } from './domain/<moved-file>';
 - `E_CYCLE_INTRODUCED`: Move creates a circular import → report the cycle, suggest moving the dependency too or routing through public API
 - `E_BOUNDARY_VIOLATION`: Import crosses forbidden layer boundary → move the file to the correct layer or route through `index.ts`
 - `E_TYPECHECK_UNAVAILABLE`: `typecheck` script missing → run `pnpm -C apps/backend tsc --noEmit` directly
+- `E_LINT_UNAVAILABLE`: `lint` script missing → run `pnpm -C apps/backend eslint src/` directly
 
 ## Reference
 

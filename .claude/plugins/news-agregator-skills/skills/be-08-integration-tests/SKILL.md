@@ -49,7 +49,13 @@ beforeAll(async () => {
   container = await new PostgreSqlContainer().start();
   // Pass the URL directly — setting process.env after module import has no effect
   prisma = new PrismaClient({ datasourceUrl: container.getConnectionUri() });
-  execSync('pnpm -C apps/backend prisma migrate deploy', { stdio: 'inherit' });
+  // Use the migrationCommand input if it differs from the default
+  const migrateCmd = '<migrationCommand or default: pnpm -C apps/backend prisma migrate deploy>';
+  execSync(migrateCmd, {
+    stdio: 'inherit',
+    // Forward DATABASE_URL so Prisma targets the container, not the ambient env
+    env: { ...process.env, DATABASE_URL: container.getConnectionUri() },
+  });
 }, 120_000); // 2 minute timeout for container startup
 
 afterAll(async () => {

@@ -26,6 +26,7 @@ Creates/modifies:
 ## Preconditions
 
 - pnpm workspace configured (`pnpm-workspace.yaml` includes `packages/*`)
+- Root `tsconfig.base.json` exists (the generated `packages/contracts/tsconfig.json` extends it)
 
 ## Workflow
 
@@ -106,6 +107,7 @@ export * from './<domain>/<contract-name>';
 
 - `E_CONTRACT_EXISTS`: Contract file already exists → ask user to version (e.g., `GetArticlesV2`) or extend
 - `E_WORKSPACE_NOT_CONFIGURED`: `pnpm-workspace.yaml` missing or doesn't include `packages/*` → add `- "packages/*"` to the packages list first
+- `E_INSTALL_FAIL`: `pnpm install` fails → run `pnpm install --prefer-offline` first; if lockfile conflicts exist, run `pnpm install --no-frozen-lockfile` and commit the updated `pnpm-lock.yaml`
 
 ## Reference
 
