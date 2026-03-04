@@ -26,7 +26,7 @@ Creates (optional — Railway also accepts manual UI config):
 - `apps/backend/Dockerfile` exists (INF-04)
 - Repository connected to a Railway project
 
-## Railway deployment steps
+## Workflow
 
 1. Create a Railway project and add a new service connected to the GitHub repository
 
