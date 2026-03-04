@@ -10,9 +10,9 @@ Create a `docker-compose.yml` for the local development stack with Postgres and 
 
 ## Inputs
 
-- `services` (required): array of services to include (e.g., `['db', 'backend']`)
-- `ports` (optional): port mappings — defaults: Postgres `5432:5432`, backend `3000:3000`
-- `envFiles` (optional): `.env` files to mount — defaults to `apps/backend/.env`
+- `services` (required): array of services to include — `'db'` for Postgres, `'backend'` for the backend container
+- `ports` (optional): host port overrides (defaults: Postgres `5432`, backend `3000`)
+- `envFiles` (optional): `.env` files to mount into the backend container — defaults to `apps/backend/.env`
 
 ## Outputs
 
@@ -27,10 +27,11 @@ Creates:
 
 ## Workflow
 
-1. Create `docker-compose.yml` at the monorepo root. Include only the services from the `services` input:
+1. Create `docker-compose.yml` at the monorepo root. **Include only the services listed in the `services` input** — omit any service block not in the array. Substitute host-side port numbers from the `ports` input (left side of `"HOST:CONTAINER"`):
 
 ```yaml
 services:
+  # Include this block only if 'db' in services:
   db:
     image: postgres:16
     environment:
@@ -38,13 +39,14 @@ services:
       POSTGRES_PASSWORD: app
       POSTGRES_DB: app
     ports:
-      - "5432:5432"
+      - "5432:5432"    # replace 5432 with ports.db if provided
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U app -d app"]
       interval: 5s
       timeout: 5s
       retries: 10
 
+  # Include this block only if 'backend' in services:
   backend:
     build:
       context: .
@@ -56,7 +58,8 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "3000:3000"
+      - "3000:3000"    # replace 3000 with ports.backend if provided
+    # Substitute env_file paths from the envFiles input:
     env_file:
       - apps/backend/.env
 ```
@@ -69,7 +72,7 @@ PORT=3000
 NODE_ENV=development
 ```
 
-3. Start the `db` service first and verify the healthcheck passes:
+3. Start the `db` service and verify the healthcheck passes (skip if `'db'` not in services):
 
 ```bash
 docker compose up -d db
@@ -84,7 +87,7 @@ docker compose up backend
 
 ## Error conditions
 
-- `E_PORT_IN_USE`: Port already bound on host → change the host-side port mapping (left side of `"5432:5432"`)
+- `E_PORT_IN_USE`: Port already bound on host → change the host-side port mapping (left side of `"5432:5432"`) in `ports` input or in `docker-compose.yml` directly
 - `E_DB_HEALTHCHECK_FAIL`: Postgres does not become healthy → check `docker logs <container>` for errors; verify disk space and Docker memory limits
 
 ## Reference

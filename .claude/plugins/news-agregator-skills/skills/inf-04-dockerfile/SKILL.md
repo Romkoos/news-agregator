@@ -10,25 +10,25 @@ Create a production-ready multi-stage Dockerfile that compiles TypeScript in a b
 
 ## Inputs
 
-- `target` (required): `'backend'` or `'frontend'`
-- `nodeVersion` (optional): defaults to `24`
+- `target` (required): `'backend'` or `'frontend'` — determines which app directory paths appear in the Dockerfile
+- `nodeVersion` (optional): defaults to `24` — substitute into the `FROM node:<nodeVersion>-slim` lines
 - `packageManager` (optional): defaults to `pnpm`
 
 ## Outputs
 
 Creates:
 
-- `apps/<target>/Dockerfile` — multi-stage build
+- `apps/<target>/Dockerfile` — multi-stage build (use `target` value in place of `<target>`)
 - `apps/<target>/.dockerignore` — excludes `node_modules`, `dist`, `.env`
 
 ## Preconditions
 
 - Build script (`pnpm build`) produces output in `dist/`
-- Lockfile exists (`pnpm-lock.yaml`)
+- `pnpm-lock.yaml` exists at the monorepo root
 
 ## Workflow
 
-1. Create `apps/<target>/.dockerignore`:
+1. Create `apps/<target>/.dockerignore` (substitute `target` for `<target>`):
 
 ```
 node_modules/
@@ -38,49 +38,49 @@ dist/
 *.local
 ```
 
-2. Create `apps/<target>/Dockerfile` using a two-stage build:
+2. Create `apps/<target>/Dockerfile`. Substitute `<target>` with the `target` input value and `24` with `nodeVersion`:
 
 ```dockerfile
-# Build stage
+# Build stage — compiles TypeScript for apps/<target>
 FROM node:24-slim AS build
 WORKDIR /app
 RUN corepack enable
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 RUN pnpm install --frozen-lockfile
 COPY . .
-RUN pnpm -C apps/backend build
+RUN pnpm -C apps/<target> build
 
-# Runtime stage
+# Runtime stage — copy lockfile + package.json so pnpm install can run
 FROM node:24-slim
 WORKDIR /app
 ENV NODE_ENV=production
-COPY --from=build /app/apps/backend/dist ./dist
-COPY --from=build /app/apps/backend/package.json ./package.json
+COPY --from=build /app/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=build /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
+COPY --from=build /app/apps/<target>/dist ./dist
+COPY --from=build /app/apps/<target>/package.json ./package.json
 RUN corepack enable && pnpm install --prod --frozen-lockfile
 CMD ["node", "dist/main.js"]
 ```
 
-> Replace `apps/backend` with `apps/frontend` if `target: 'frontend'`. For a frontend target, the runtime stage typically serves the `dist/` output via a static file server (e.g., `node dist/server.js` or an nginx image).
-
-> Replace `24` with `nodeVersion` input if provided.
+> For `target: 'frontend'`, the runtime CMD typically serves a static file server rather than `dist/main.js`.
 
 3. Build locally to verify the image compiles successfully:
 
 ```bash
-docker build -f apps/backend/Dockerfile -t app-backend .
+docker build -f apps/<target>/Dockerfile -t app-<target> .
 ```
 
-4. Run briefly to verify startup and health:
+4. Run briefly to verify startup:
 
 ```bash
-docker run --rm -e DATABASE_URL=postgresql://... -p 3000:3000 app-backend
+docker run --rm -e DATABASE_URL=postgresql://... -p 3000:3000 app-<target>
 ```
 
 ## Error conditions
 
-- `E_BUILD_FAIL`: TypeScript build fails in the Docker build stage → check tsconfig `outDir` matches the `COPY --from=build` destination path
-- `E_MISSING_LOCKFILE`: No `pnpm-lock.yaml` found → commit the lockfile before building (`pnpm install` generates it)
-- `E_PROD_INSTALL_FAIL`: `pnpm install --prod` fails in runtime stage → ensure the runtime package.json lists all required production dependencies
+- `E_BUILD_FAIL`: TypeScript build fails in Docker build stage → check that `tsconfig.json` `outDir` is `./dist` and that all path aliases resolve
+- `E_MISSING_LOCKFILE`: No `pnpm-lock.yaml` found → run `pnpm install` locally to generate the lockfile, then commit it
+- `E_PROD_INSTALL_FAIL`: `pnpm install --prod` fails in runtime stage → verify the runtime `package.json` lists all production dependencies and that `pnpm-lock.yaml` is correctly copied into the stage
 
 ## Reference
 

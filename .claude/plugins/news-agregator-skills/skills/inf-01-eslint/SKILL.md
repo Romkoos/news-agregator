@@ -32,7 +32,9 @@ Creates/modifies:
 pnpm add -D eslint typescript-eslint @eslint/js
 ```
 
-2. Create `eslint.config.mjs` using flat config format:
+2. Create `eslint.config.mjs` using flat config format.
+
+   **If `typedLinting: true`**, include the `languageOptions` block:
 
 ```js
 import eslint from '@eslint/js';
@@ -43,10 +45,26 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   {
     files: ['**/*.ts', '**/*.tsx'],
-    // Remove languageOptions block if typedLinting: false
     languageOptions: {
       parserOptions: { projectService: true },
     },
+    rules: { 'no-console': 'warn' },
+  },
+  { ignores: ['**/dist/**', '**/.turbo/**', '**/node_modules/**'] }
+);
+```
+
+   **If `typedLinting: false`**, omit the `languageOptions` block entirely:
+
+```js
+import eslint from '@eslint/js';
+import tseslint from 'typescript-eslint';
+
+export default tseslint.config(
+  eslint.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    files: ['**/*.ts', '**/*.tsx'],
     rules: { 'no-console': 'warn' },
   },
   { ignores: ['**/dist/**', '**/.turbo/**', '**/node_modules/**'] }
@@ -61,6 +79,7 @@ export default tseslint.config(
 
 - `E_ESLINT_CONFIG_INVALID`: Config file has syntax errors → check all import paths resolve and the `tseslint.config()` wrapper is used (not a bare array export)
 - `E_TYPESCRIPT_PROJECT_MISSING`: `typedLinting: true` but no `tsconfig.json` found → create a tsconfig first or set `typedLinting: false`
+- `E_LINT_FAIL`: Lint reports violations on the clean codebase → the violations are pre-existing; fix them or add them to a temporary `eslint-disable` comment, then re-run
 
 ## Reference
 

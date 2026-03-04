@@ -10,10 +10,10 @@ Configure Prettier with consistent settings and Tailwind CSS class sorting plugi
 
 ## Inputs
 
-- `printWidth` (optional): defaults to `100`
-- `semi` (optional): defaults to `true`
-- `singleQuote` (optional): defaults to `true`
-- `tailwind` (required): `true` to add `prettier-plugin-tailwindcss`
+- `printWidth` (optional): defaults to `100` — substitute into `.prettierrc`
+- `semi` (optional): defaults to `true` — substitute into `.prettierrc`
+- `singleQuote` (optional): defaults to `true` — substitute into `.prettierrc`
+- `tailwind` (required): `true` to install and add `prettier-plugin-tailwindcss`
 
 ## Outputs
 
@@ -32,13 +32,17 @@ Modifies:
 
 ## Workflow
 
-1. Install if not present:
+1. Install Prettier. **If `tailwind: true`**, include the Tailwind plugin:
 
 ```bash
+# tailwind: true
 pnpm add -D prettier prettier-plugin-tailwindcss
+
+# tailwind: false — omit prettier-plugin-tailwindcss
+pnpm add -D prettier
 ```
 
-2. Create `.prettierrc` at the monorepo root (or at the scope package root):
+2. Create `.prettierrc`. Substitute `printWidth`, `semi`, and `singleQuote` from inputs. **If `tailwind: false`**, omit the `plugins` field:
 
 ```json
 {
@@ -50,7 +54,7 @@ pnpm add -D prettier prettier-plugin-tailwindcss
 }
 ```
 
-> Remove `prettier-plugin-tailwindcss` from `plugins` if `tailwind: false`.
+> Replace `100` with the `printWidth` input value; replace `true`/`false` for `semi` and `singleQuote` accordingly. Remove the `"plugins"` key if `tailwind: false`.
 
 3. Create `.prettierignore`:
 

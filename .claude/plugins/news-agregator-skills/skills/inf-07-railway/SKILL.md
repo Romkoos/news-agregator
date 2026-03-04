@@ -11,9 +11,9 @@ Configure Railway to deploy the backend from the monorepo using the Dockerfile.
 ## Inputs
 
 - `serviceName` (required): Railway service name (e.g., `news-agregator-backend`)
-- `rootDir` (optional): monorepo root directory for the service — set to `apps/backend` (Railway root directory setting)
-- `startCmd` (required): start command (e.g., `node dist/main.js`)
-- `envVars` (required): array of required environment variable names (e.g., `['DATABASE_URL', 'PORT', 'NODE_ENV']`)
+- `rootDir` (optional): monorepo subdirectory Railway should treat as the service root — set to `apps/backend` for the backend service
+- `startCmd` (required): process start command (e.g., `node dist/main.js` or `prisma migrate deploy && node dist/main.js`)
+- `envVars` (required): array of environment variable names that must be set (e.g., `['DATABASE_URL', 'PORT', 'NODE_ENV']`)
 
 ## Outputs
 
@@ -30,20 +30,15 @@ Creates (optional — Railway also accepts manual UI config):
 
 1. Create a Railway project and add a new service connected to the GitHub repository
 
-2. In service **Settings → Source**: set **Root Directory** to `apps/backend` (matches `rootDir` input). Railway will detect the `Dockerfile` automatically.
+2. In service **Settings → Source**: set **Root Directory** to the `rootDir` input value (e.g., `apps/backend`). Railway will detect the `Dockerfile` in that directory automatically.
 
-3. In service **Settings → Variables**: add all env vars from the `envVars` input:
-   - `DATABASE_URL`: Railway Postgres connection string (copy from the Railway Postgres service)
-   - `PORT`: Railway sets this automatically; add explicitly as `3000` for local clarity
+3. In service **Settings → Variables**: add each variable from the `envVars` input:
+   - For each name in `envVars`, create the variable and set its value
+   - `DATABASE_URL`: copy from the Railway Postgres service reference (auto-populated when linked)
+   - `PORT`: Railway injects this automatically; set explicitly to `3000` for local clarity
    - `NODE_ENV`: `production`
 
-4. For Prisma migrations, set **Start Command** to run migrations before the server starts:
-
-```
-prisma migrate deploy && node dist/main.js
-```
-
-5. Optionally create `apps/backend/railway.toml` to pin the configuration as code:
+4. Optionally create `apps/backend/railway.toml` to pin config as code. Substitute `startCmd` into `startCommand`:
 
 ```toml
 [build]
@@ -51,17 +46,19 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "prisma migrate deploy && node dist/main.js"
+startCommand = "prisma migrate deploy && node dist/main.js"  # replace with startCmd input
 healthcheckPath = "/health"
 restartPolicyType = "ON_FAILURE"
 ```
 
-6. Trigger a deploy (push to the connected branch) and monitor the build logs in the Railway dashboard
+> Note: `dockerfilePath` in `railway.toml` is relative to `rootDir`. If `rootDir` is `apps/backend`, the `Dockerfile` at `apps/backend/Dockerfile` is referenced simply as `"Dockerfile"`.
+
+5. Trigger a deploy (push to the connected branch or click **Deploy** in the Railway dashboard) and monitor build logs
 
 ## Error conditions
 
-- `E_START_CMD_INVALID`: Railway does not expand `$VAR` in start commands with Dockerfile builder → use a shell entrypoint script (e.g., `sh -c 'prisma migrate deploy && node dist/main.js'`) or define variables inline
-- `E_ENV_MISSING`: Build or runtime fails with a missing env var → check the Railway **Variables** panel; ensure `DATABASE_URL` was copied from the Postgres service reference, not hardcoded
+- `E_START_CMD_INVALID`: Railway does not expand `$VAR` in start commands with Dockerfile builder → use `sh -c 'prisma migrate deploy && node dist/main.js'` as the start command, or use the `railway.toml` `startCommand` field which accepts shell syntax
+- `E_ENV_MISSING`: Build or runtime fails with a missing env var → check the Railway **Variables** panel; verify every name in the `envVars` input has a value set
 
 ## Reference
 
