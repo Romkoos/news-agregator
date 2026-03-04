@@ -35,6 +35,7 @@ export class DomainError extends Error {
   constructor(
     public readonly code: string,
     message: string,
+    public readonly httpStatus: number = 500,
     public readonly context?: Record<string, unknown>
   ) {
     super(message);
@@ -44,7 +45,7 @@ export class DomainError extends Error {
 
 export class ArticleNotFoundError extends DomainError {
   constructor(id: string) {
-    super('ARTICLE_NOT_FOUND', `Article ${id} not found`, { id });
+    super('ARTICLE_NOT_FOUND', `Article ${id} not found`, 404, { id });
   }
 }
 // TODO: add one class per error code from inputs
@@ -60,17 +61,11 @@ export function domainErrorHandler(
   error: FastifyError | DomainError,
   request: FastifyRequest,
   reply: FastifyReply
-): void {
+): Promise<void> {
   if (error instanceof DomainError) {
-    const statusMap: Record<string, number> = {
-      ARTICLE_NOT_FOUND: 404,
-      // TODO: add entries per error code from inputs
-    };
-    const status = statusMap[error.code] ?? 500;
-    void reply.status(status).send({ error: error.code, message: error.message });
-    return;
+    return await reply.status(error.httpStatus).send({ error: error.code, message: error.message });
   }
-  void reply.status(500).send({ error: 'INTERNAL_ERROR', message: 'An unexpected error occurred' });
+  return await reply.status(500).send({ error: 'INTERNAL_ERROR', message: 'An unexpected error occurred' });
 }
 ```
 

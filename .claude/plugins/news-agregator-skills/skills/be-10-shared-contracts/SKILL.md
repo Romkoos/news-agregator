@@ -44,6 +44,8 @@ Creates/modifies:
 }
 ```
 
+> Note: `main`, `types`, and `exports` intentionally point to `.ts` source — backend and frontend share the same TypeScript compilation pipeline via tsconfig project references, so no pre-compilation step is needed.
+
 ```json
 // packages/contracts/tsconfig.json
 {
@@ -73,6 +75,15 @@ export const <ContractName>Output = z.object({
 });
 
 export type <ContractName>Output = z.infer<typeof <ContractName>Output>;
+
+// Omit if schemas.Error was not provided
+export const <ContractName>Error = z.object({
+  code: z.string(),
+  message: z.string(),
+  // TODO: add extra fields from schemas.Error
+});
+
+export type <ContractName>Error = z.infer<typeof <ContractName>Error>;
 ```
 
 4. Export from `packages/contracts/src/index.ts`:

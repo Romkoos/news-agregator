@@ -47,8 +47,8 @@ let prisma: PrismaClient;
 
 beforeAll(async () => {
   container = await new PostgreSqlContainer().start();
-  process.env.DATABASE_URL = container.getConnectionUri();
-  prisma = new PrismaClient();
+  // Pass the URL directly — setting process.env after module import has no effect
+  prisma = new PrismaClient({ datasourceUrl: container.getConnectionUri() });
   execSync('pnpm -C apps/backend prisma migrate deploy', { stdio: 'inherit' });
 }, 120_000); // 2 minute timeout for container startup
 
@@ -71,13 +71,26 @@ describe('<SuiteName> integration', () => {
 });
 ```
 
-3. Add a `test:integration` script to `apps/backend/package.json` if missing:
+3. Create `apps/backend/vitest.integration.config.ts` if it does not exist:
+
+```typescript
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    include: ['test/integration/**/*.test.ts'],
+    testTimeout: 120_000,
+  },
+});
+```
+
+4. Add a `test:integration` script to `apps/backend/package.json` if missing:
 
 ```json
 "test:integration": "vitest run --config vitest.integration.config.ts"
 ```
 
-4. Run `pnpm -C apps/backend test:integration` to verify the container starts and tests pass
+5. Run `pnpm -C apps/backend test:integration` to verify the container starts and tests pass
 
 ## Error conditions
 
