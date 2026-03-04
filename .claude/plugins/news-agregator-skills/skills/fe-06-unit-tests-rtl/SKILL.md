@@ -37,26 +37,33 @@ import { ComponentName } from './component-name';
 // Factory keeps each test isolated with a fresh QueryClient
 const makeQc = () => new QueryClient({ defaultOptions: { queries: { retry: false } } });
 
+// Generate one it() per entry in the `scenarios` input array.
+// Replace '<scenario-N-description>' with the actual scenario string from inputs.
 describe('ComponentName', () => {
-  it('renders the button', async () => {
-    render(
-      <QueryClientProvider client={makeQc()}>
-        <ComponentName />
-      </QueryClientProvider>
-    );
-    expect(screen.getByRole('button', { name: /submit/i })).toBeInTheDocument();
-  });
-
-  it('disables during loading', async () => {
+  it('<scenario-1-description>', async () => {
     const user = userEvent.setup();
     render(
       <QueryClientProvider client={makeQc()}>
         <ComponentName />
       </QueryClientProvider>
     );
-    await user.click(screen.getByRole('button', { name: /submit/i }));
-    expect(screen.getByRole('button', { name: /submit/i })).toBeDisabled();
+    // TODO: interact and assert based on the scenario description
+    expect(screen.getByRole('button')).toBeInTheDocument();
   });
+
+  it('<scenario-2-description>', async () => {
+    const user = userEvent.setup();
+    render(
+      <QueryClientProvider client={makeQc()}>
+        <ComponentName />
+      </QueryClientProvider>
+    );
+    // TODO: interact and assert based on the scenario description
+    await user.click(screen.getByRole('button'));
+    expect(screen.getByRole('button')).toBeDisabled();
+  });
+
+  // Add one it() block for each remaining item in scenarios[]
 });
 ```
 

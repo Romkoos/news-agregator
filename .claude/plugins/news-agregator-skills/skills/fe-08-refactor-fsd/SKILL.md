@@ -36,13 +36,13 @@ Move FSD slice content between layers, respecting the dependency direction and p
 
 3. Move files from `from` to `to` using the editor (Read + Write, not shell `mv`) to preserve content, updating internal relative imports within the moved files
 
-4. Search for all imports referencing the moved paths:
+4. If `updateImports: true`, search for all imports referencing the moved paths and update them:
 
 ```bash
 grep -r "from '.*<from-slice>'" apps/frontend/src/ --include="*.ts" --include="*.tsx"
 ```
 
-Update each import path to the new location (or to the destination slice's `index.ts`).
+Update each import to point to the new location (or to the destination slice's `index.ts`). If `updateImports: false`, skip this step — note that imports will remain broken until updated manually.
 
 5. Update source `index.ts` to remove moved exports; update destination `index.ts` to add them:
 

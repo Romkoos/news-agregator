@@ -11,7 +11,7 @@ Create Mock Service Worker (MSW) handlers for API endpoints used in frontend tes
 ## Inputs
 
 - `endpoints` (required): array of `{method, path, responseShape}` (e.g., `{method: "GET", path: "/api/articles", responseShape: {articles: []}}`)
-- `mode` (required): `'node'` for Vitest (server-side MSW) — use `'browser'` only for manual testing in the browser
+- `mode` (required): `'node'` for Vitest (server-side MSW via `setupServer`) or `'browser'` for manual browser testing (uses `setupWorker` instead of `setupServer` — browser mode skips the `setupTests.ts` integration)
 
 ## Outputs
 
@@ -47,7 +47,9 @@ export const handlers = [
 ];
 ```
 
-3. Create `apps/frontend/src/shared/api/mocks/server.ts`:
+3. Create the server/worker entry based on `mode`:
+
+**If `mode: 'node'`** — create `apps/frontend/src/shared/api/mocks/server.ts`:
 
 ```typescript
 import { setupServer } from 'msw/node';
@@ -56,7 +58,18 @@ import { handlers } from './handlers';
 export const server = setupServer(...handlers);
 ```
 
-4. Add lifecycle hooks to `apps/frontend/src/setupTests.ts`:
+**If `mode: 'browser'`** — create `apps/frontend/src/shared/api/mocks/browser.ts`:
+
+```typescript
+import { setupWorker } from 'msw/browser';
+import { handlers } from './handlers';
+
+export const worker = setupWorker(...handlers);
+```
+
+> Browser mode does not integrate with `setupTests.ts`. Start the worker manually in the app entry point: `worker.start()`. Skip step 4 when `mode: 'browser'`.
+
+4. **(`mode: 'node'` only)** Add lifecycle hooks to `apps/frontend/src/setupTests.ts`:
 
 ```typescript
 import { server } from './shared/api/mocks/server';

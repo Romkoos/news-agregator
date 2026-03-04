@@ -57,14 +57,25 @@ export default <PageSliceName>Page;
 export { default as <PageSliceName>Page } from './ui/page';
 ```
 
-4. Add route entry in `apps/frontend/src/app/router.ts`:
+4. Add route entry in `apps/frontend/src/app/router.ts`. Declare `lazy` at module scope (not inside the route config), then wrap in `Suspense`:
 
 ```typescript
-import { lazy } from 'react';
+import { lazy, Suspense } from 'react';
+
+// Declare at module scope (before createBrowserRouter call):
+const <PageSliceName>Page = lazy(() =>
+  import('../../../pages/<page-slice-name>').then((m) => ({ default: m.<PageSliceName>Page }))
+);
+
 // Add inside the createBrowserRouter routes array:
 {
   path: '<routePath>',
-  element: <lazy(() => import('../../../pages/<page-slice-name>').then((m) => ({ default: m.<PageSliceName>Page }))) />,
+  // If layout input provided, wrap <PageSliceName>Page in the layout component:
+  element: (
+    <Suspense fallback={null}>
+      <<PageSliceName>Page />
+    </Suspense>
+  ),
   // loader: authGuardLoader,  // uncomment if authGuard: true
 }
 ```

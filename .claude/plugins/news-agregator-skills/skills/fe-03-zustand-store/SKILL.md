@@ -33,7 +33,7 @@ Creates inside the slice's `model/` directory:
 
 ```typescript
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 type State = {
   // TODO: add fields from stateFields input
@@ -41,8 +41,6 @@ type State = {
 };
 
 // With persist:
-import { createJSONStorage } from 'zustand/middleware';
-
 export const <storeName> = create<State>()(
   persist(
     (set) => ({
