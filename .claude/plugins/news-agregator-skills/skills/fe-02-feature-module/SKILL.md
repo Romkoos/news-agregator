@@ -37,7 +37,7 @@ Creates `apps/frontend/src/features/<featureName>/`:
 
 ## Workflow
 
-1. Create all four directories (`ui/`, `model/`, `api/`) plus `index.ts`
+1. Create `ui/`, `api/`, and `index.ts`. Create `model/` only if `storeShape` is provided — omit the directory entirely otherwise.
 
 2. Create `ui/<component-name>.tsx`:
 
@@ -71,16 +71,23 @@ export const use<FeatureName>Store = create<State>()((set) => ({
 }));
 ```
 
-4. Create `api/<feature-name>.ts` with a `useMutation` hook:
+4. Create `api/<feature-name>.ts` with a `useMutation` hook. If `apiContract` is provided, import the contract type from `packages/contracts` and replace `unknown`:
 
 ```typescript
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+// If apiContract provided: import type { <ContractName>Input } from '@app/contracts';
 
 export function use<FeatureName>Mutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: unknown /* TODO: use contract type */) => {
-      // TODO: call the API endpoint
+    mutationFn: async (input: unknown /* replace with <ContractName>Input if apiContract provided */) => {
+      const res = await fetch('/api/<feature-name>', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(input),
+      });
+      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+      return res.json();
     },
     onSuccess: () => {
       // TODO: invalidate related queries

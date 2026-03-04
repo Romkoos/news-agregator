@@ -29,37 +29,46 @@ Creates inside the slice's `api/` directory:
 
 ## Workflow
 
-1. Create `keys.ts` with a typed query key factory:
+1. Parse `keyShape` to decide which factory methods to generate. Use the shape elements as the key prefix and add `list`/`detail` variants for dynamic params:
 
 ```typescript
 // api/keys.ts — replace '<scope>' with the scope input (e.g., 'articles')
+// keyShape example: ['feed', 'articles', { page }] → generates list factory
 export const <scope>Keys = {
   all: ['<scope>'] as const,
+  // Add list() if keyShape includes dynamic params (e.g., page, filters):
   list: (params: Record<string, unknown>) => [...<scope>Keys.all, 'list', params] as const,
+  // Add detail() if keyShape includes an id segment:
   detail: (id: string) => [...<scope>Keys.all, 'detail', id] as const,
 };
 ```
 
-2. Create `queries.ts` with `useQuery` for reads and `useMutation` for writes:
+2. Create `queries.ts`. Use `fetcherSignature` as the async function body for `queryFn` — wire it in directly rather than inlining a raw `fetch` call:
 
 ```typescript
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { <scope>Keys } from './keys';
 
-// Read hook example — adapt for the queryName and fetcherSignature inputs
+// Replace the lambda body with the fetcherSignature input:
+// fetcherSignature example: (params) => articlesApi.list(params)
 export function use<QueryName>(params: Record<string, unknown>) {
   return useQuery({
     queryKey: <scope>Keys.list(params),
-    queryFn: () => fetch(`/api/<scope>?${new URLSearchParams(params as any)}`).then((r) => r.json()),
+    queryFn: () => /* <fetcherSignature>(params) — paste the fetcher here */ Promise.resolve(null),
   });
 }
 
-// Write hook example — add per mutation required
+// Write hook — add one useMutation per write operation
 export function use<QueryName>Mutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (input: unknown /* TODO: use contract type */) => {
-      const res = await fetch('/api/<scope>', { method: 'POST', body: JSON.stringify(input) });
+      const res = await fetch('/api/<scope>', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(input),
+      });
+      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
       return res.json();
     },
     onSuccess: () => {

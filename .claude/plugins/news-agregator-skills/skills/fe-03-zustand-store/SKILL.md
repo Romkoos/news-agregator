@@ -41,29 +41,39 @@ type State = {
 };
 
 // With persist:
+import { createJSONStorage } from 'zustand/middleware';
+
 export const <storeName> = create<State>()(
   persist(
     (set) => ({
       // TODO: default values from stateFields[*].defaultValue
       // TODO: action implementations
     }),
-    { name: '<persist.key>' }
+    {
+      name: '<persist.key>',
+      // Use persist.storage to select the storage engine:
+      storage: createJSONStorage(() => localStorage), // replace with sessionStorage if persist.storage === 'sessionStorage'
+    }
   )
 );
 
-// Without persist (remove the persist wrapper):
-// export const <storeName> = create<State>()((set) => ({ ... }));
+// Without persist (use when persist input is omitted):
+// export const <storeName> = create<State>()((set) => ({
+//   // TODO: default values and action implementations
+// }));
 ```
 
 2. If `persist` is omitted, use the bare `create<State>()((set) => ({ ... }))` pattern (no middleware wrapper)
 
-3. Create `selectors.ts` with pure functions operating on the store state:
+3. Create `selectors.ts` with pure functions operating on the store state. Type the `state` parameter using the `State` type exported from `store.ts`:
 
 ```typescript
-import type { StoreApi } from 'zustand';
+// Import the State type from the store file
+import type { State } from './store';
+// Or re-export State from store.ts: export type { State };
 
 // Example selector — replace with fields from stateFields input
-export const selectIsAuthenticated = (state: ReturnType<<storeName>.getState>) =>
+export const selectIsAuthenticated = (state: State): boolean =>
   state.token !== null;
 ```
 
