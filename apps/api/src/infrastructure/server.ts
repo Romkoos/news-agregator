@@ -1,4 +1,4 @@
-import Fastify from 'fastify'
+import Fastify, { type FastifyInstance, type FastifyRequest, type FastifyReply } from 'fastify'
 import fastifyCookie from '@fastify/cookie'
 import fastifyJwt from '@fastify/jwt'
 import fastifyCors from '@fastify/cors'
@@ -13,13 +13,27 @@ import {
   ForbiddenError,
 } from '../shared/errors.js'
 
-export function buildServer(opts: { jwtSecret: string; corsOrigin: string }) {
+declare module 'fastify' {
+  interface FastifyInstance {
+    authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>
+  }
+}
+
+export function buildServer(opts: { jwtSecret: string; corsOrigin: string }): FastifyInstance {
   const fastify = Fastify({ logger: true })
 
   fastify.register(fastifyCors, { origin: opts.corsOrigin, credentials: true })
   fastify.register(fastifyJwt, { secret: opts.jwtSecret })
   fastify.register(fastifyCookie)
   fastify.register(fastifySensible)
+
+  fastify.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      await request.jwtVerify()
+    } catch {
+      reply.code(401).send({ message: 'Unauthorized' })
+    }
+  })
 
   fastify.setErrorHandler((error, _request, reply) => {
     if (error instanceof ZodError) {
