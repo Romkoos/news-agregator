@@ -2,18 +2,19 @@ import { useEffect } from 'react'
 import { useAuthStore } from '@/entities/user/index.js'
 import { api } from '@/shared/api/index.js'
 import { setupInterceptors } from '@/shared/api/interceptors.js'
+import { i18n } from '@/shared/i18n/index.js'
 import type { ReactNode } from 'react'
 
-/**
- * Wires Axios interceptors once, then rehydrates the authenticated user from
- * /users/me when a persisted access token is present in the store.
- * Sets isHydrated=true once both steps complete so AuthGuard can decide.
- */
+function applyTheme(theme: 'LIGHT' | 'DARK') {
+  document.documentElement.classList.toggle('dark', theme === 'DARK')
+  localStorage.setItem('theme', theme === 'DARK' ? 'dark' : 'light')
+}
+
 export function ApiProvider({ children }: { children: ReactNode }) {
   const { accessToken, setAuth, clearAuth } = useAuthStore()
 
   useEffect(() => {
-    // ── 1. Wire Axios interceptors (token attach + 401 refresh + logout) ──
+    // ── 1. Wire Axios interceptors ──
     setupInterceptors(
       api,
       () => useAuthStore.getState().accessToken,
@@ -24,7 +25,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       clearAuth,
     )
 
-    // ── 2. Rehydrate user on boot (handles page refresh with stored token) ──
+    // ── 2. Rehydrate user on boot ──
     if (!accessToken) {
       useAuthStore.setState({ isHydrated: true })
       return
@@ -33,8 +34,15 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     api
       .get('/users/me')
       .then((r) => {
-        const { id, email, name, avatarUrl } = r.data
+        const { id, email, name, avatarUrl, preferences } = r.data
         setAuth(accessToken, { id, email, name, avatarUrl })
+
+        // Apply server preferences — API takes priority over localStorage (design spec)
+        if (preferences) {
+          applyTheme(preferences.theme)
+          void i18n.changeLanguage(preferences.language)
+          localStorage.setItem('lang', preferences.language)
+        }
       })
       .catch(() => {
         clearAuth()
@@ -42,7 +50,6 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       .finally(() => {
         useAuthStore.setState({ isHydrated: true })
       })
-    // Run once on mount only — accessToken comes from persisted store
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
