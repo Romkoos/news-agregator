@@ -1,0 +1,58 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "news": "News",
+    "bookmarks": "Bookmarks",
+    "settings": "Settings"
+  },
+  "auth": {
+    "login": "Sign In",
+    "register": "Sign Up",
+    "logout": "Sign Out",
+    "email": "Email",
+    "password": "Password",
+    "name": "Full Name",
+    "loginTitle": "Welcome back",
+    "registerTitle": "Create account",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "invalidCredentials": "Invalid email or password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password"
+  },
+  "profile": {
+    "title": "Profile",
+    "updateSuccess": "Profile updated successfully",
+    "passwordChanged": "Password changed successfully",
+    "avatarUrl": "Avatar URL"
+  },
+  "settings": {
+    "title": "Settings",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "language": "Language",
+    "english": "English",
+    "russian": "Russian"
+  },
+  "news": {
+    "allCategories": "All",
+    "noArticles": "No articles found",
+    "readMore": "Read more",
+    "bookmark": "Bookmark",
+    "unbookmark": "Remove bookmark",
+    "bookmarks": "Bookmarks",
+    "noBookmarks": "No bookmarks yet"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome, {{name}}!"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry"
+  }
+}

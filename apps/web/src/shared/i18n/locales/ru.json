@@ -1,0 +1,58 @@
+{
+  "nav": {
+    "dashboard": "Главная",
+    "news": "Новости",
+    "bookmarks": "Закладки",
+    "settings": "Настройки"
+  },
+  "auth": {
+    "login": "Войти",
+    "register": "Зарегистрироваться",
+    "logout": "Выйти",
+    "email": "Электронная почта",
+    "password": "Пароль",
+    "name": "Полное имя",
+    "loginTitle": "С возвращением",
+    "registerTitle": "Создать аккаунт",
+    "noAccount": "Нет аккаунта?",
+    "hasAccount": "Уже есть аккаунт?",
+    "invalidCredentials": "Неверный email или пароль",
+    "currentPassword": "Текущий пароль",
+    "newPassword": "Новый пароль"
+  },
+  "profile": {
+    "title": "Профиль",
+    "updateSuccess": "Профиль обновлён",
+    "passwordChanged": "Пароль изменён",
+    "avatarUrl": "URL аватара"
+  },
+  "settings": {
+    "title": "Настройки",
+    "theme": "Тема",
+    "light": "Светлая",
+    "dark": "Тёмная",
+    "language": "Язык",
+    "english": "Английский",
+    "russian": "Русский"
+  },
+  "news": {
+    "allCategories": "Все",
+    "noArticles": "Статей не найдено",
+    "readMore": "Читать",
+    "bookmark": "В закладки",
+    "unbookmark": "Убрать из закладок",
+    "bookmarks": "Закладки",
+    "noBookmarks": "Закладок пока нет"
+  },
+  "dashboard": {
+    "title": "Главная",
+    "welcome": "Добро пожаловать, {{name}}!"
+  },
+  "common": {
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "loading": "Загрузка...",
+    "error": "Что-то пошло не так",
+    "retry": "Повторить"
+  }
+}
