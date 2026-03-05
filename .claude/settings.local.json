@@ -2,11 +2,20 @@
   "permissions": {
     "allow": [
       "Bash(git:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm:*)",
+      "Bash(docker info:*)",
+      "Bash(npx vitest:*)",
+      "Bash(export:*)",
+      "Bash(node:*)",
+      "Bash(./node_modules/.bin/tsx:*)",
+      "Bash(echo:*)"
     ]
   },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
-    "news-agregator-skills": true
+    "news-agregator-skills": true,
+    "frontend-design@claude-plugins-official": true
   }
 }
