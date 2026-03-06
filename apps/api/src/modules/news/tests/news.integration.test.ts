@@ -29,7 +29,7 @@ beforeAll(async () => {
   container = await new PostgreSqlContainer('postgres:16').start()
   const url = container.getConnectionUri()
 
-  execSync(`pnpm --filter @repo/db prisma migrate deploy`, {
+  execSync(`pnpm run --filter @repo/db db:push -- --accept-data-loss`, {
     env: { ...process.env, DATABASE_URL: url },
     stdio: 'inherit',
   })
