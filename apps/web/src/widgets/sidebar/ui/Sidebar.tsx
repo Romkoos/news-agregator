@@ -24,9 +24,9 @@ export function Sidebar() {
   const user = useAuthStore(s => s.user)
 
   return (
-    <aside className="flex h-full w-64 flex-col border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900">
+    <aside className="hidden lg:flex h-full w-64 flex-col border-r border-surface bg-surface dark:border-gray-700 dark:bg-gray-900">
       {/* Logo */}
-      <div className="flex h-16 items-center border-b border-gray-200 px-6 dark:border-gray-700">
+      <div className="flex h-16 items-center border-b border-surface/60 px-6 dark:border-gray-700">
         <span className="text-lg font-bold text-gray-900 dark:text-white">
           News Digest
         </span>
@@ -58,7 +58,7 @@ export function Sidebar() {
       </nav>
 
       {/* User section */}
-      <div className="border-t border-gray-200 p-4 dark:border-gray-700">
+      <div className="border-t border-surface/60 p-4 dark:border-gray-700">
         <button
           onClick={() => navigate('/profile')}
           className="flex w-full items-center gap-3 rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
