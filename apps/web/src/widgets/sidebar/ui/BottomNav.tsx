@@ -1,13 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/shared/lib/index.js'
-
-const navItems = [
-  { labelKey: 'nav.dashboard', to: '/',         icon: '📰' },
-  { labelKey: 'nav.news',      to: '/news',      icon: '🗂️' },
-  { labelKey: 'nav.bookmarks', to: '/bookmarks', icon: '🔖' },
-  { labelKey: 'nav.settings',  to: '/settings',  icon: '⚙️' },
-]
+import { navItems } from '../model/navItems.js'
 
 export function BottomNav() {
   const { t } = useTranslation()

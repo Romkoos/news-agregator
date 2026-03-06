@@ -4,19 +4,7 @@ import { useAuthStore } from '@/entities/user/index.js'
 import { UserAvatar } from '@/entities/user/index.js'
 import { LogoutButton } from '@/features/auth/index.js'
 import { cn } from '@/shared/lib/index.js'
-
-interface NavItem {
-  labelKey: string
-  to: string
-  icon: string
-}
-
-const navItems: NavItem[] = [
-  { labelKey: 'nav.dashboard', to: '/', icon: '📰' },
-  { labelKey: 'nav.news', to: '/news', icon: '🗂️' },
-  { labelKey: 'nav.bookmarks', to: '/bookmarks', icon: '🔖' },
-  { labelKey: 'nav.settings', to: '/settings', icon: '⚙️' },
-]
+import { navItems } from '../model/navItems.js'
 
 export function Sidebar() {
   const { t } = useTranslation()
