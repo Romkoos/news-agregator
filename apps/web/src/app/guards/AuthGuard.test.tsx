@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { createMemoryRouter, RouterProvider } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { AuthGuard } from './AuthGuard.js'
 import { useAuthStore } from '@/entities/user/index.js'
 
@@ -13,18 +13,16 @@ function renderWithRouter(authenticated: boolean) {
     isHydrated: true,
   })
 
-  const router = createMemoryRouter(
-    [
-      {
-        element: <AuthGuard />,
-        children: [{ path: '/', element: <div>Protected Content</div> }],
-      },
-      { path: '/login', element: <div>Login Page</div> },
-    ],
-    { initialEntries: ['/'] }
+  return render(
+    <MemoryRouter initialEntries={['/']}>
+      <Routes>
+        <Route element={<AuthGuard />}>
+          <Route path="/" element={<div>Protected Content</div>} />
+        </Route>
+        <Route path="/login" element={<div>Login Page</div>} />
+      </Routes>
+    </MemoryRouter>,
   )
-
-  return render(<RouterProvider router={router} />)
 }
 
 beforeEach(() => {
@@ -34,17 +32,16 @@ beforeEach(() => {
 describe('AuthGuard', () => {
   it('shows loading spinner when not hydrated', () => {
     useAuthStore.setState({ isHydrated: false, accessToken: null, user: null })
-    const router = createMemoryRouter(
-      [
-        {
-          element: <AuthGuard />,
-          children: [{ path: '/', element: <div>Content</div> }],
-        },
-        { path: '/login', element: <div>Login</div> },
-      ],
-      { initialEntries: ['/'] }
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <Routes>
+          <Route element={<AuthGuard />}>
+            <Route path="/" element={<div>Content</div>} />
+          </Route>
+          <Route path="/login" element={<div>Login</div>} />
+        </Routes>
+      </MemoryRouter>,
     )
-    render(<RouterProvider router={router} />)
     expect(screen.getByLabelText('Loading')).toBeInTheDocument()
   })
 
@@ -53,8 +50,8 @@ describe('AuthGuard', () => {
     expect(screen.getByText('Protected Content')).toBeInTheDocument()
   })
 
-  it('redirects to /login when not authenticated', async () => {
+  it('redirects to /login when not authenticated', () => {
     renderWithRouter(false)
-    expect(await screen.findByText('Login Page')).toBeInTheDocument()
+    expect(screen.getByText('Login Page')).toBeInTheDocument()
   })
 })
