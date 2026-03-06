@@ -62,7 +62,7 @@ export function Sidebar() {
         <button
           onClick={() => navigate('/profile')}
           className="flex w-full items-center gap-3 rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
-          aria-label={`${user?.name ?? ''} — go to profile`}
+          aria-label={user?.name ? `${user.name} — go to profile` : 'Go to profile'}
         >
           <UserAvatar
             name={user?.name ?? ''}
