@@ -53,8 +53,8 @@ describe('AuthGuard', () => {
     expect(screen.getByText('Protected Content')).toBeInTheDocument()
   })
 
-  it('redirects to /login when not authenticated', () => {
+  it('redirects to /login when not authenticated', async () => {
     renderWithRouter(false)
-    expect(screen.getByText('Login Page')).toBeInTheDocument()
+    expect(await screen.findByText('Login Page')).toBeInTheDocument()
   })
 })
